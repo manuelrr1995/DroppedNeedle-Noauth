@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { ChevronDown, UsersRound } from 'lucide-svelte';
 	import type { LibraryArtistSummary } from '$lib/types';
@@ -85,7 +86,7 @@
 				provider_choice: providerChoice
 			});
 			dialog.close();
-			if (result.surviving_artist_id) await goto(`/artist/${result.surviving_artist_id}`);
+			if (result.surviving_artist_id) await goto(resolve(`/artist/${result.surviving_artist_id}`));
 		} catch {
 			confirmed = false;
 			stalePreview = true;
