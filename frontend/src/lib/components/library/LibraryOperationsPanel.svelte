@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import {
 		CirclePause,
 		CirclePlay,
@@ -441,7 +442,7 @@
 					<div class="flex flex-wrap items-center justify-between gap-2 text-sm">
 						<span class="text-base-content/55"
 							>Provider work runs in the background without delaying local playback.</span
-						><a class="link link-primary" href="/library/review?state=needs_review"
+						><a class="link link-primary" href={resolve('/library/review?state=needs_review')}
 							>Review identification</a
 						>
 					</div>
@@ -504,7 +505,7 @@
 				>
 			</div>
 			<a
-				href="/library/review"
+				href={resolve('/library/review')}
 				class="rounded-box border border-base-content/10 bg-base-100 p-3 hover:bg-base-200"
 				><ListChecks class="mb-2 h-4 w-4 text-primary" /><span
 					class="block text-xs text-base-content/50">Needs review</span
