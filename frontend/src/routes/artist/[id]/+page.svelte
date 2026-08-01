@@ -10,14 +10,18 @@
 	import ProviderArtistPage from './ProviderArtistPage.svelte';
 
 	interface Props {
-		data: { artistId: string; primarySource: MusicSource };
+		data: { artistId: string; primarySource: MusicSource; discographyView?: boolean };
 	}
 
 	let { data }: Props = $props();
-	const localQuery = getLibraryArtistDetailQuery(() => data.artistId);
+	const discographyView = $derived(data.discographyView === true);
+	// empty id disables the query: the local lookup is unused in discography view
+	const localQuery = getLibraryArtistDetailQuery(() => (discographyView ? '' : data.artistId));
 	const localArtist = $derived(localQuery.data);
 	const canonicalLocalId = $derived(localArtist?.id ?? null);
-	const shouldRedirect = $derived(canonicalLocalId !== null && canonicalLocalId !== data.artistId);
+	const shouldRedirect = $derived(
+		!discographyView && canonicalLocalId !== null && canonicalLocalId !== data.artistId
+	);
 
 	$effect(() => {
 		if (localArtist && shouldRedirect) {
@@ -27,7 +31,9 @@
 	});
 </script>
 
-{#if localQuery.isLoading || shouldRedirect}
+{#if discographyView}
+	<ProviderArtistPage {data} />
+{:else if localQuery.isLoading || shouldRedirect}
 	<div class="w-full max-w-7xl mx-auto px-2 py-4 sm:px-4 sm:py-8 lg:px-8">
 		<div class="flex items-end gap-6">
 			<div class="skeleton h-48 w-48 rounded-full"></div>
