@@ -23,4 +23,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/yourgithubusername/droppedneedle-noauth:latest
+          tags: ghcr.io/manuelrr1995/droppedneedle-noauth:latest
